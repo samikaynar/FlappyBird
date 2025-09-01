@@ -6,8 +6,18 @@ pygame.init()
 clock = pygame.time.Clock()
 fps = 60
 
+
+#define game variables
 screen_width = 432
 screen_height = 468
+ground_scroll = 0
+scroll_speed = 4
+flying = False
+run = True
+game_over=False
+
+
+
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Welcome to my Flappy Bird Gamee')
 
@@ -46,6 +56,7 @@ class Bird(pygame.sprite.Sprite):
 				self.speed = 8
 			if self.rect.bottom < int(screen_height-height_ground_real):
 				self.rect.y = self.rect.y + self.speed
+	
 		# jump
 		keys= pygame.key.get_pressed()
 		if keys[pygame.K_SPACE]:
@@ -55,8 +66,6 @@ class Bird(pygame.sprite.Sprite):
 
 		self.image = pygame.transform.rotate(self.images[self.index], self.speed *-3)
 
-		print(self.speed)
-
 
 
 
@@ -65,11 +74,6 @@ bird_group = pygame.sprite.Group()
 flappy = Bird(40,int(screen_height / 2))
 
 bird_group.add(flappy)
-
-#define game variables
-ground_scroll = 0
-scroll_speed = 4
-
 
 
 #load images
@@ -84,8 +88,8 @@ bg=pygame.transform.scale(bg,(wight_bg // 2 , height_bg // 2))
 ground_img=pygame.transform.scale(ground_img , (wight_ground // 2 , height_ground // 2))
 
 
-flying = False
-run = True
+
+
 while run:
 
 	clock.tick(fps)
@@ -95,17 +99,24 @@ while run:
 	bird_group.draw(screen)
 	bird_group.update()
 
-	#draw and scroll the ground
 	screen.blit(ground_img, (ground_scroll, screen_height-height_ground_real))
-	ground_scroll -= scroll_speed
-	if abs(ground_scroll) > 16:
-		ground_scroll = 0
+
+	# check if bird has hit the bottom
+	if flappy.rect.bottom > int(screen_height-height_ground_real):
+		game_over=True
+		flying=False 
+
+	#draw and scroll the ground
+	if game_over == False:
+		ground_scroll -= scroll_speed
+		if abs(ground_scroll) > 16:
+			ground_scroll = 0
 
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			run = False
-		if event.type == pygame.KEYDOWN:
+		if event.type == pygame.KEYDOWN and flying == False and game_over==False:
 			if event.key ==pygame.K_SPACE:
 				flying=True
 
