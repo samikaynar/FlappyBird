@@ -18,6 +18,7 @@ class Bird(pygame.sprite.Sprite):
 		self.images=[]
 		self.index=0
 		self.counter=0
+		self.speed=0
 		for num in range(1, 4):
 			img = pygame.image.load(f'C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\bird{num}.png')
 			img_width=img.get_width()
@@ -38,6 +39,14 @@ class Bird(pygame.sprite.Sprite):
 				self.index=0
 
 		self.image=self.images[self.index]
+
+		self.speed=self.speed + 0.2
+		if self.speed >= 6:
+			self.speed = 6
+		if self.rect.bottom < int(screen_height-height_ground_real):
+			self.rect.y = self.rect.y + self.speed
+
+		print(self.speed)
 
 
 
