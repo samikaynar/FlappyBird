@@ -39,12 +39,21 @@ class Bird(pygame.sprite.Sprite):
 				self.index=0
 
 		self.image=self.images[self.index]
+		# gravity
+		if flying == True:
+			self.speed=self.speed + 0.3
+			if self.speed >= 8:
+				self.speed = 8
+			if self.rect.bottom < int(screen_height-height_ground_real):
+				self.rect.y = self.rect.y + self.speed
+		# jump
+		keys= pygame.key.get_pressed()
+		if keys[pygame.K_SPACE]:
+			self.speed=-6
 
-		self.speed=self.speed + 0.2
-		if self.speed >= 6:
-			self.speed = 6
-		if self.rect.bottom < int(screen_height-height_ground_real):
-			self.rect.y = self.rect.y + self.speed
+		# rotation
+
+		self.image = pygame.transform.rotate(self.images[self.index], self.speed *-3)
 
 		print(self.speed)
 
@@ -61,6 +70,8 @@ bird_group.add(flappy)
 ground_scroll = 0
 scroll_speed = 4
 
+
+
 #load images
 bg = pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\bg.png')
 ground_img = pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\ground.png')
@@ -72,6 +83,8 @@ height_ground_real=height_ground / 2
 bg=pygame.transform.scale(bg,(wight_bg // 2 , height_bg // 2))
 ground_img=pygame.transform.scale(ground_img , (wight_ground // 2 , height_ground // 2))
 
+
+flying = False
 run = True
 while run:
 
@@ -92,7 +105,10 @@ while run:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			run = False
+		if event.type == pygame.KEYDOWN:
+			if event.key ==pygame.K_SPACE:
+				flying=True
 
-	pygame.display.update()
+	pygame.display.update() 
 
 pygame.quit()
