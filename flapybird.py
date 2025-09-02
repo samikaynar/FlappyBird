@@ -11,15 +11,18 @@ fps = 60
 screen_width = 432
 screen_height = 468
 ground_scroll = 0
-scroll_speed = 4
+scroll_speed = 3
 flying = False
 run = True
 game_over=False
 
+delay_of_pipe=1000
+last_pipe= pygame.time.get_ticks()
 
+pipe_space=80
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Welcome to my Flappy Bird Gamee')
+pygame.display.set_caption('Welcome to My Flappy Bird Gamee')
 
 #bird class
 class Bird(pygame.sprite.Sprite):
@@ -42,37 +45,60 @@ class Bird(pygame.sprite.Sprite):
 	def update(self):
 		flappy_cooldown=5
 		self.counter+=1
-		if self.counter > flappy_cooldown:
-			self.index+=1
-			self.counter=0
-			if self.index >= len(self.images):
-				self.index=0
+		if game_over == False :
+			if self.counter > flappy_cooldown:
+				self.index+=1
+				self.counter=0
+				if self.index >= len(self.images):
+					self.index=0
 
-		self.image=self.images[self.index]
-		# gravity
-		if flying == True:
-			self.speed=self.speed + 0.3
-			if self.speed >= 8:
-				self.speed = 8
-			if self.rect.bottom < int(screen_height-height_ground_real):
-				self.rect.y = self.rect.y + self.speed
-	
-		# jump
-		keys= pygame.key.get_pressed()
-		if keys[pygame.K_SPACE]:
-			self.speed=-6
+			self.image=self.images[self.index]
+			# gravity
+			if flying == True:
+				self.speed=self.speed + 0.3
+				if self.speed >= 8:
+					self.speed = 8
+				if self.rect.bottom < int(screen_height-height_ground_real):
+					self.rect.y = self.rect.y + self.speed
+		
+			# jump
+			keys= pygame.key.get_pressed()
+			if keys[pygame.K_SPACE]:
+				self.speed=-4
 
-		# rotation
+			# rotation
 
-		self.image = pygame.transform.rotate(self.images[self.index], self.speed *-3)
+			self.image = pygame.transform.rotate(self.images[self.index], self.speed *-3)
+		else:
+			self.image = pygame.transform.rotate(self.images[self.index], -90)
 
 
+class Pipe(pygame.sprite.Sprite):
+	def __init__(self, x, y, position ):
+		pygame.sprite.Sprite.__init__(self)
+		self.image=pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\pipe.png')
+		self.image_height=self.image.get_height()
+		self.image_weith=self.image.get_width()
+		self.image=pygame.transform.scale(self.image,(self.image_weith // 2, self.image_height // 2) )
+		
+		#1 for pipe from bottom , -1 for pipe from top
+		if position == 1 :
+			self.rect=self.image.get_rect()
+			self.rect.topleft=[x,(y + int(pipe_space / 2))]
+		if position == -1:
+			self.image = pygame.transform.flip(self.image, False , True)
+			self.rect=self.image.get_rect()
+			self.rect.bottomleft = [x, (y - int (pipe_space / 2))]
+		
+
+	def update(self):
+		self.rect.x -=scroll_speed
 
 
 bird_group = pygame.sprite.Group()
+pipe_group = pygame.sprite.Group()
 
 flappy = Bird(40,int(screen_height / 2))
-
 bird_group.add(flappy)
 
 
@@ -96,8 +122,13 @@ while run:
 
 	#draw background
 	screen.blit(bg, (0,0))
+
 	bird_group.draw(screen)
 	bird_group.update()
+	pipe_group.draw(screen)
+	pipe_group.update()
+
+
 
 	screen.blit(ground_img, (ground_scroll, screen_height-height_ground_real))
 
@@ -108,6 +139,17 @@ while run:
 
 	#draw and scroll the ground
 	if game_over == False:
+		time_now=pygame.time.get_ticks()
+		print(time_now)
+
+		if delay_of_pipe < time_now - last_pipe :
+			bttm_pipe = Pipe(screen_width ,int(screen_height / 2 ),1)
+			top_pipe=Pipe(screen_width ,int(screen_height / 2 ),-1)
+			pipe_group.add(bttm_pipe)
+			pipe_group.add(top_pipe)
+			last_pipe = time_now
+
+
 		ground_scroll -= scroll_speed
 		if abs(ground_scroll) > 16:
 			ground_scroll = 0
