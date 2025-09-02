@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+import random
 
 pygame.init()
 
@@ -72,7 +73,7 @@ class Bird(pygame.sprite.Sprite):
 		else:
 			self.image = pygame.transform.rotate(self.images[self.index], -90)
 
-
+#pipe class
 class Pipe(pygame.sprite.Sprite):
 	def __init__(self, x, y, position ):
 		pygame.sprite.Sprite.__init__(self)
@@ -93,6 +94,8 @@ class Pipe(pygame.sprite.Sprite):
 
 	def update(self):
 		self.rect.x -=scroll_speed
+		if self.rect.right < 0:
+			self.kill()
 
 
 bird_group = pygame.sprite.Group()
@@ -126,33 +129,39 @@ while run:
 	bird_group.draw(screen)
 	bird_group.update()
 	pipe_group.draw(screen)
-	pipe_group.update()
+	
 
 
 
 	screen.blit(ground_img, (ground_scroll, screen_height-height_ground_real))
-
+	# check for collision
+	if pygame.sprite.groupcollide(bird_group , pipe_group , False, False):
+		game_over=True
+		flying=False
 	# check if bird has hit the bottom
 	if flappy.rect.bottom > int(screen_height-height_ground_real):
 		game_over=True
 		flying=False 
 
 	#draw and scroll the ground
-	if game_over == False:
+	if game_over == False and flying == True:
 		time_now=pygame.time.get_ticks()
 		print(time_now)
-
+		
+		# creating pipes
 		if delay_of_pipe < time_now - last_pipe :
-			bttm_pipe = Pipe(screen_width ,int(screen_height / 2 ),1)
-			top_pipe=Pipe(screen_width ,int(screen_height / 2 ),-1)
+			pipe_hight=random.randint(-80,80)
+			bttm_pipe = Pipe(screen_width ,int((screen_height / 2 + pipe_hight )),1)
+			top_pipe=Pipe(screen_width ,int((screen_height / 2) + pipe_hight ),-1)
 			pipe_group.add(bttm_pipe)
 			pipe_group.add(top_pipe)
 			last_pipe = time_now
 
-
+		pipe_group.update()
 		ground_scroll -= scroll_speed
 		if abs(ground_scroll) > 16:
 			ground_scroll = 0
+		
 
 
 	for event in pygame.event.get():
