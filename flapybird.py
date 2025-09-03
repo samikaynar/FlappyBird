@@ -33,7 +33,7 @@ last_pipe= pygame.time.get_ticks()
 pipe_space=80
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Welcome to My Flappy Bird Gamee')
+pygame.display.set_caption('Welcome to My Sami ! Flappy Bird Gamee')
 
 #score function
 
@@ -63,7 +63,7 @@ class Bird(pygame.sprite.Sprite):
 		self.counter=0
 		self.speed=0
 		for num in range(1, 4):
-			img = pygame.image.load(f'C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\bird{num}.png')
+			img = pygame.image.load(f"img/bird{num}.png")
 			img_width=img.get_width()
 			img_height=img.get_height()
 			img=pygame.transform.scale(img ,(img_width // 2 , img_height // 2) )
@@ -108,7 +108,7 @@ class Bird(pygame.sprite.Sprite):
 class Pipe(pygame.sprite.Sprite):
 	def __init__(self, x, y, position ):
 		pygame.sprite.Sprite.__init__(self)
-		self.image=pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\pipe.png')
+		self.image=pygame.image.load("img/pipe.png")
 		self.image_height=self.image.get_height()
 		self.image_weith=self.image.get_width()
 		self.image=pygame.transform.scale(self.image,(self.image_weith // 2, self.image_height // 2) )
@@ -155,9 +155,9 @@ class Button():
 
 
 #load images
-bg = pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\bg.png')
-ground_img = pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\ground.png')
-restart_image=pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\restart.png')
+bg = pygame.image.load("img/bg.png")
+ground_img = pygame.image.load("img/ground.png")
+restart_image=pygame.image.load("img/restart.png")
 wight_bg=bg.get_width()
 height_bg=bg.get_height()
 wight_ground=ground_img.get_width()
