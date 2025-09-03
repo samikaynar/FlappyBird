@@ -23,6 +23,8 @@ flying = False
 run = True
 game_over=False
 score=0
+high_score=0
+
 pass_pipe = False
 
 delay_of_pipe=1000
@@ -40,7 +42,17 @@ def draw_score(text , font , colour, x , y ):
 	img = font.render(text, True, colour)
 	screen.blit(img,(x,y))
 
+def draw_high_score(text , font , colour , y):
+	img = font.render(text , True , colour)
+	rect = img.get_rect(center=(screen_width // 2, y)) 
+	screen.blit(img,rect)
 
+def reset_game():
+	pipe_group.empty()
+	flappy.rect.x = 40
+	flappy.rect.y = int(screen_height / 2)
+	score = 0
+	return score
 
 #bird class
 class Bird(pygame.sprite.Sprite):
@@ -117,16 +129,35 @@ class Pipe(pygame.sprite.Sprite):
 			self.kill()
 
 
-bird_group = pygame.sprite.Group()
-pipe_group = pygame.sprite.Group()
 
-flappy = Bird(40,int(screen_height / 2))
-bird_group.add(flappy)
+class Button():
+	def __init__(self , image,x,y):
+		self.image=image
+		self.rect=self.image.get_rect()
+		self.rect.center=[x,y]
+		
+	def draw(self):
+
+		action = False
+		#get mouse position
+		mouse = pygame.mouse.get_pos()
+	
+		if self.rect.collidepoint(mouse):
+		
+			if pygame.mouse.get_pressed()[0] == 1:
+				action=True
+
+
+		screen.blit(self.image,(self.rect.x,self.rect.y))
+		return action
+	
+		
 
 
 #load images
 bg = pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\bg.png')
 ground_img = pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\ground.png')
+restart_image=pygame.image.load('C:\\Users\\kayna\\OneDrive\\Masaüstü\\python\\flapybird\\restart.png')
 wight_bg=bg.get_width()
 height_bg=bg.get_height()
 wight_ground=ground_img.get_width()
@@ -136,6 +167,15 @@ bg=pygame.transform.scale(bg,(wight_bg // 2 , height_bg // 2))
 ground_img=pygame.transform.scale(ground_img , (wight_ground // 2 , height_ground // 2))
 
 
+bird_group = pygame.sprite.Group()
+pipe_group = pygame.sprite.Group()
+
+flappy = Bird(40,int(screen_height / 2))
+bird_group.add(flappy)
+
+
+#creating a button
+button=Button(restart_image , screen_width // 2 , screen_height // 2 - 40)
 
 
 while run:
@@ -198,6 +238,14 @@ while run:
 			ground_scroll = 0
 		
 
+	if game_over==True:
+		if high_score < score:
+			high_score = score
+		draw_high_score('High score: ' + str(high_score),font , white , 100)
+		if button.draw():
+			score = reset_game()
+			game_over = False
+			
 
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
