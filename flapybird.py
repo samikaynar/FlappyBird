@@ -7,6 +7,12 @@ pygame.init()
 clock = pygame.time.Clock()
 fps = 60
 
+#define font
+font = pygame.font.SysFont('Bauhaus 93', 40)
+
+#define colours
+white = (255, 255, 255)
+
 
 #define game variables
 screen_width = 432
@@ -16,6 +22,8 @@ scroll_speed = 3
 flying = False
 run = True
 game_over=False
+score=0
+pass_pipe = False
 
 delay_of_pipe=1000
 last_pipe= pygame.time.get_ticks()
@@ -24,6 +32,15 @@ pipe_space=80
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Welcome to My Flappy Bird Gamee')
+
+#score function
+
+def draw_score(text , font , colour, x , y ):
+
+	img = font.render(text, True, colour)
+	screen.blit(img,(x,y))
+
+
 
 #bird class
 class Bird(pygame.sprite.Sprite):
@@ -44,6 +61,15 @@ class Bird(pygame.sprite.Sprite):
 		self.rect.center= [x,y]
 
 	def update(self):
+
+		# gravity
+		if flying == True:
+			self.speed=self.speed + 0.3
+			if self.speed >= 8:
+				self.speed = 8
+			if self.rect.bottom < int(screen_height-height_ground_real):
+				self.rect.y = self.rect.y + self.speed
+		
 		flappy_cooldown=5
 		self.counter+=1
 		if game_over == False :
@@ -54,14 +80,7 @@ class Bird(pygame.sprite.Sprite):
 					self.index=0
 
 			self.image=self.images[self.index]
-			# gravity
-			if flying == True:
-				self.speed=self.speed + 0.3
-				if self.speed >= 8:
-					self.speed = 8
-				if self.rect.bottom < int(screen_height-height_ground_real):
-					self.rect.y = self.rect.y + self.speed
-		
+			
 			# jump
 			keys= pygame.key.get_pressed()
 			if keys[pygame.K_SPACE]:
@@ -135,18 +154,34 @@ while run:
 
 	screen.blit(ground_img, (ground_scroll, screen_height-height_ground_real))
 	# check for collision
-	if pygame.sprite.groupcollide(bird_group , pipe_group , False, False):
+	if pygame.sprite.groupcollide(bird_group , pipe_group , False, False) or flappy.rect.top < 0 :
 		game_over=True
-		flying=False
+		
 	# check if bird has hit the bottom
-	if flappy.rect.bottom > int(screen_height-height_ground_real):
+	if flappy.rect.bottom >= int(screen_height-height_ground_real):
 		game_over=True
 		flying=False 
+	
+	# colculating the score
+	if len(pipe_group) > 0 :
+		if bird_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.left\
+			and bird_group.sprites()[0].rect.right < pipe_group.sprites()[0].rect.right\
+			and pass_pipe == False:
+			pass_pipe = True
+		if pass_pipe == True:
+			if bird_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.right:
+				score += 1
+				pass_pipe = False
+
+			
+
+	# draw the score
+	draw_score(str(score),font , white , screen_width/2 , 20 )
 
 	#draw and scroll the ground
 	if game_over == False and flying == True:
 		time_now=pygame.time.get_ticks()
-		print(time_now)
+		
 		
 		# creating pipes
 		if delay_of_pipe < time_now - last_pipe :
